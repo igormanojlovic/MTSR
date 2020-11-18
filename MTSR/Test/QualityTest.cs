@@ -44,7 +44,7 @@ namespace MTSR
 					{
 						int id = 0;
 						var model = representation.ToInstance(db);
-						foreach (var ts in Directory.GetFiles(inputFolder, "*.csv"))
+						foreach (var ts in Directory.GetFiles(inputFolder, "*.csv").OrderNaturally())
 						{
 							id++;
 							var dates = new HashSet<DateTime>();

@@ -3,9 +3,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security;
 
 namespace MTSR
 {
+	[SuppressUnmanagedCodeSecurity]
+	internal static class SafeNativeMethods
+	{
+		[DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
+		public static extern int StrCmpLogicalW(string psz1, string psz2);
+	}
+
+	public sealed class NaturalStringComparer : IComparer<string>
+	{
+		public int Compare(string a, string b)
+		{
+			return SafeNativeMethods.StrCmpLogicalW(a, b);
+		}
+	}
+
 	public static class Common
 	{
 		#region Private Methods
@@ -39,6 +56,9 @@ namespace MTSR
 				return reader.ReadToEnd();
 			}
 		}
+
+		public static IEnumerable<string> OrderNaturally(this IEnumerable<string> strings)
+			=> strings.OrderBy(s => s, new NaturalStringComparer());
 
 		public static int GCD(this IEnumerable<int> values)
 		{
